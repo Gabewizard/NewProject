@@ -25,19 +25,42 @@ export class Player extends Component {
         this.weaponSystem = this.getComponent(PlayerWeaponSystem);
     }
 
-    public initialize(camera: Camera): void {}
+    public initialize(camera: Camera): void {
+        this.mainCamera = camera;
+    }
 
     start(): void {}
 
     protected update(deltaTime: number): void {}
 
-    public processKeyDown(event: EventKeyboard): void {}
+    public processKeyDown(event: EventKeyboard): void {
+        if (this.inputSystem) {
+            this.inputSystem.handleKeyDown(event);
+        }
+    }
 
-    public processKeyUp(event: EventKeyboard): void {}
+    public processKeyUp(event: EventKeyboard): void {
+        if (this.inputSystem) {
+            this.inputSystem.handleKeyUp(event);
+        }
+    }
 
-    public processMouseDown(event: EventMouse): void {}
+    public processMouseDown(event: EventMouse): void {
+        if (this.inputSystem) {
+            this.inputSystem.handleMouseDown(event);
+        }
+    }
 
-    public processMouseUp(event: EventMouse): void {}
+    public processMouseUp(event: EventMouse): void {
+        if (this.inputSystem) {
+            this.inputSystem.handleMouseUp(event);
+        }
+    }
 
-    public processMouseMove(event: EventMouse): void {}
+    public processMouseMove(event: EventMouse): void {
+        if (this.inputSystem) {
+            this.inputSystem.handleMouseMove(event);
+        }
+    }
 }
+

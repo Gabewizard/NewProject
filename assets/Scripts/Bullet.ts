@@ -20,8 +20,15 @@ export class Bullet extends Component {
     private lifeTimer: number = 0;
     private isHit: boolean = false;
     private damageAmount: number = 1;
+    private readonly GROUP_PLAYER_BULLET = 1 << 3;
+    private readonly GROUP_ENEMY_BULLET = 1 << 4;
 
-    public initialize(pool: NodePool, velocity: Vec2, damage: number): void {
+    public initialize(
+        pool: NodePool,
+        velocity: Vec2,
+        damage: number,
+        isPlayerWeapon: boolean,
+    ): void {
         this.myPool = pool;
         this.damageAmount = damage;
         this.lifeTimer = 0;
@@ -29,6 +36,13 @@ export class Bullet extends Component {
         let rigidBody = this.getComponent(RigidBody2D);
         if (rigidBody) {
             rigidBody.linearVelocity = velocity;
+        }
+
+        let collider = this.getComponent(Collider2D);
+        if (collider) {
+            collider.group = isPlayerWeapon
+                ? this.GROUP_PLAYER_BULLET
+                : this.GROUP_ENEMY_BULLET;
         }
     }
 

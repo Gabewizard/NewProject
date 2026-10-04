@@ -21,13 +21,19 @@ export class Weapon extends Component {
     private burstDelay: number | null = null;
     private burstTimer: number = 0;
     private pendingBurstShots: number = 0;
+    private isPlayerWeapon: boolean = false;
     private firingEuler: Vec3 = new Vec3();
 
     public get currentFireMode(): FireMode {
         return this.fireMode;
     }
 
-    public initialize(config: WeaponConfig, prefab: Prefab, container: Node): void {
+    public initialize(
+        config: WeaponConfig,
+        prefab: Prefab,
+        container: Node,
+        isPlayerWeapon: boolean,
+    ): void {
         this.bulletPrefab = prefab;
         this.bulletContainer = container;
         this.fireMode = config.fireMode;
@@ -36,6 +42,7 @@ export class Weapon extends Component {
         this.damageAmount = config.damageAmount;
         this.burstCount = config.burstCount ?? 0;
         this.burstDelay = config.burstDelay ?? 0;
+        this.isPlayerWeapon = isPlayerWeapon;
 
         this.setUpObjectPool(config);
         this.setUpBarrels(config);
@@ -108,6 +115,7 @@ export class Weapon extends Component {
                 this.bulletSpeed,
                 this.magazinePool,
                 this.damageAmount,
+                this.isPlayerWeapon,
             );
         }
     }

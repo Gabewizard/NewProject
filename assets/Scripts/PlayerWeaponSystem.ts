@@ -24,6 +24,7 @@ export class PlayerWeaponSystem extends Component {
             bulletPrefab,
             playerNode,
             bulletContainer,
+            true,
         );
         this.currentWeapon = this.currentWeaponNode.getComponent(Weapon);
     }

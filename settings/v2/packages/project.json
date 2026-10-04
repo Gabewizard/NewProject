@@ -3,6 +3,41 @@
   "physics": {
     "gravity": {
       "y": 0
+    },
+    "collisionGroups": [
+      {
+        "index": 1,
+        "name": "PLAYER"
+      },
+      {
+        "index": 2,
+        "name": "ENEMY"
+      },
+      {
+        "index": 3,
+        "name": "PLAYER_BULLET"
+      },
+      {
+        "index": 4,
+        "name": "ENEMY_BULLET"
+      },
+      {
+        "index": 5,
+        "name": "OBSTACLES"
+      },
+      {
+        "index": 6,
+        "name": "BORDERS"
+      }
+    ],
+    "collisionMatrix": {
+      "0": 1,
+      "1": 112,
+      "2": 12,
+      "3": 100,
+      "4": 66,
+      "5": 10,
+      "6": 26
     }
   }
 }

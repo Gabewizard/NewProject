@@ -31,7 +31,12 @@ export class Player extends Component {
 
     start(): void {}
 
-    protected update(deltaTime: number): void {}
+    protected update(deltaTime: number): void {
+        if (this.inputSystem && this.movementSystem) {
+            let moveDir = this.inputSystem.getMoveDirection();
+            this.movementSystem.updateMovement(moveDir);
+        }
+    }
 
     public processKeyDown(event: EventKeyboard): void {
         if (this.inputSystem) {

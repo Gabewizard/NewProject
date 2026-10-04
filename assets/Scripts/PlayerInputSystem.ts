@@ -21,6 +21,8 @@ export class PlayerInputSystem extends Component {
     private isLeft: boolean = false;
     private isRight: boolean = false;
 
+    private moveDir: Vec2 = new Vec2();
+
     public handleKeyDown(event: EventKeyboard): void {
         switch (event.keyCode) {
             case KeyCode.KEY_W:
@@ -90,7 +92,10 @@ export class PlayerInputSystem extends Component {
     public handleMouseMove(event: EventMouse): void {}
 
     public getMoveDirection(): Vec2 {
-        return new Vec2();
+        this.moveDir.x = (this.isRight ? 1 : 0) - (this.isLeft ? 1 : 0);
+        this.moveDir.y = (this.isUp ? 1 : 0) - (this.isDown ? 1 : 0);
+        this.moveDir.normalize();
+        return this.moveDir;
     }
 
     public calculateRotationAngle(

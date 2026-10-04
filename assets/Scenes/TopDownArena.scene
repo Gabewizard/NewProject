@@ -2079,7 +2079,7 @@
       "y": 0
     },
     "_angularVelocity": 0,
-    "_fixedRotation": false,
+    "_fixedRotation": true,
     "_id": "d5xoQRRItGaIAqyOyIdlej"
   },
   {
@@ -2103,7 +2103,7 @@
       "x": -9.2,
       "y": -1.6
     },
-    "_radius": 30.5,
+    "_radius": 25.5,
     "_id": "a2m+oD+8JNhJDJvRR6MR2m"
   },
   {

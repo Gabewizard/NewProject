@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, NodePool, Prefab } from 'cc';
+import { _decorator, Component, instantiate, Node, NodePool, Prefab, Quat, Vec3 } from 'cc';
 import { Barrel } from './Barrel';
 import { FireMode } from './WeaponConfig';
 import type { WeaponConfig } from './WeaponConfig';
@@ -21,6 +21,7 @@ export class Weapon extends Component {
     private burstDelay: number | null = null;
     private burstTimer: number = 0;
     private pendingBurstShots: number = 0;
+    private firingEuler: Vec3 = new Vec3();
 
     public get currentFireMode(): FireMode {
         return this.fireMode;
@@ -68,7 +69,11 @@ export class Weapon extends Component {
         if (this.pendingBurstShots > 0) {
             this.burstTimer -= dt;
             if (this.burstTimer <= 0) {
-                let angle = this.node.parent ? this.node.parent.angle : 0;
+                let angle = 0;
+                if (this.node.parent) {
+                    Quat.toEulerInYXZOrder(this.firingEuler, this.node.parent.worldRotation);
+                    angle = this.firingEuler.z;
+                }
                 this.executeFireLogic(angle);
                 this.pendingBurstShots--;
                 this.burstTimer = this.burstDelay ?? 0;

@@ -4,11 +4,16 @@ import {
     Component,
     EventKeyboard,
     EventMouse,
+    Node,
+    Prefab,
+    Quat,
+    Vec3,
 } from 'cc';
 
 import { PlayerInputSystem } from './PlayerInputSystem';
 import { PlayerMovementSystem } from './PlayerMovementSystem';
 import { PlayerWeaponSystem } from './PlayerWeaponSystem';
+import type { WeaponConfig } from './WeaponConfig';
 
 const { ccclass } = _decorator;
 
@@ -18,6 +23,7 @@ export class Player extends Component {
     private movementSystem: PlayerMovementSystem | null = null;
     private weaponSystem: PlayerWeaponSystem | null = null;
     private mainCamera: Camera | null = null;
+    private firingEuler: Vec3 = new Vec3();
 
     protected onLoad(): void {
         this.inputSystem = this.getComponent(PlayerInputSystem);
@@ -29,6 +35,21 @@ export class Player extends Component {
         this.mainCamera = camera;
     }
 
+    public initializeWeapon(
+        config: WeaponConfig,
+        bulletPrefab: Prefab,
+        bulletContainer: Node,
+    ): void {
+        if (this.weaponSystem) {
+            this.weaponSystem.equipWeapon(
+                config,
+                bulletPrefab,
+                bulletContainer,
+                this.node,
+            );
+        }
+    }
+
     start(): void {}
 
     protected update(deltaTime: number): void {
@@ -36,6 +57,17 @@ export class Player extends Component {
             let moveDir = this.inputSystem.getMoveDirection();
             this.movementSystem.updateMovement(moveDir);
         }
+
+        if (this.inputSystem && this.weaponSystem) {
+            let isFiring = this.inputSystem.isShooting;
+            this.weaponSystem.processFiring(isFiring, this.getFiringAngle());
+        }
+    }
+
+    private getFiringAngle(): number {
+        // Use the full 2D heading after physics writes the node rotation.
+        Quat.toEulerInYXZOrder(this.firingEuler, this.node.worldRotation);
+        return this.firingEuler.z;
     }
 
     public processKeyDown(event: EventKeyboard): void {
@@ -53,6 +85,10 @@ export class Player extends Component {
     public processMouseDown(event: EventMouse): void {
         if (this.inputSystem) {
             this.inputSystem.handleMouseDown(event);
+        }
+
+        if (event.getButton() === 0 && this.weaponSystem) {
+            this.weaponSystem.triggerSingleShot(this.getFiringAngle());
         }
     }
 

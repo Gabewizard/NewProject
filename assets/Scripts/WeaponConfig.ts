@@ -28,7 +28,7 @@ export const PISTOL: WeaponConfig = {
     name: 'Pistol',
     fireMode: FireMode.SEMI_AUTO,
     fireRate: 0.1,
-    bulletSpeed: 25,
+    bulletSpeed:50,
     damageAmount: 10,
     magazineSize: 10,
     barrels: [

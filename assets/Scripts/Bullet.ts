@@ -8,6 +8,7 @@ import {
     Vec2,
 } from 'cc';
 import type { IPhysics2DContact } from 'cc';
+import { HealthSystem } from './HealthSystem';
 
 const { ccclass, property } = _decorator;
 
@@ -60,6 +61,11 @@ export class Bullet extends Component {
     ): void {
         if (this.isHit) return;
 
+        const healthSystem = otherCollider.node.getComponent(HealthSystem);
+        if (healthSystem) {
+            healthSystem.takeDamage(this.damageAmount);
+        }
+
         // Return the bullet during update, outside the physics callback.
         this.isHit = true;
     }
@@ -94,4 +100,3 @@ export class Bullet extends Component {
         }
     }
 }
-

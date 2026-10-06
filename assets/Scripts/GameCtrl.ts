@@ -11,7 +11,8 @@ import {
 } from 'cc';
 
 import { Player } from './Player';
-import { PISTOL } from './WeaponConfig';
+import { DOUBLE_GUN, FORWARD_REAR_PISTOL, PISTOL, SPREAD_GUN } from './WeaponConfig';
+import type { WeaponConfig } from './WeaponConfig';
 
 const { ccclass, property } = _decorator;
 
@@ -42,6 +43,10 @@ export class GameCtrl extends Component {
             );
         }
 
+        if (this.player) {
+            this.player.node.on('WeaponSelect', this.handleWeaponSwap, this);
+        }
+
         input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
         input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
         input.on(Input.EventType.MOUSE_MOVE, this.onMouseMove, this);
@@ -50,6 +55,10 @@ export class GameCtrl extends Component {
     }
 
     protected onDestroy(): void {
+        if (this.player) {
+            this.player.node.off('WeaponSelect', this.handleWeaponSwap, this);
+        }
+
         input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
         input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
         input.off(Input.EventType.MOUSE_MOVE, this.onMouseMove, this);
@@ -58,6 +67,34 @@ export class GameCtrl extends Component {
     }
 
     update(deltaTime: number): void {}
+
+    private handleWeaponSwap(weaponIndex: number): void {
+        if (!this.player || !this.defaultBulletPrefab || !this.bulletContainer) return;
+
+        let config: WeaponConfig;
+        switch (weaponIndex) {
+            case 1:
+                config = PISTOL;
+                break;
+            case 2:
+                config = DOUBLE_GUN;
+                break;
+            case 3:
+                config = FORWARD_REAR_PISTOL;
+                break;
+            case 4:
+                config = SPREAD_GUN;
+                break;
+            default:
+                return;
+        }
+
+        this.player.initializeWeapon(
+            config,
+            this.defaultBulletPrefab,
+            this.bulletContainer,
+        );
+    }
 
     private onKeyDown(event: EventKeyboard): void {
         if (this.player) {
@@ -89,3 +126,4 @@ export class GameCtrl extends Component {
         }
     }
 }
+

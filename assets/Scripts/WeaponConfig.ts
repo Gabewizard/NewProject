@@ -35,3 +35,46 @@ export const PISTOL: WeaponConfig = {
         { pos: new Vec2(), angle: 0, size: 1.0 },
     ],
 };
+
+
+export const SPREAD_GUN: WeaponConfig = {
+    name: 'SpreadGun',
+    fireMode: FireMode.RAPID,
+    fireRate: 0.2,
+    bulletSpeed: 20,
+    damageAmount: 5,
+    magazineSize: 30,
+    barrels: [
+        { pos: new Vec2(), angle: 0, size: 0.9 },
+        { pos: new Vec2(), angle: 15, size: 0.9 },
+        { pos: new Vec2(), angle: -15, size: 0.9 },
+    ],
+};
+
+export const FORWARD_REAR_PISTOL: WeaponConfig = {
+    name: 'ForwardRearPistol',
+    fireMode: FireMode.SEMI_AUTO,
+    fireRate: 0.1,
+    bulletSpeed: 25,
+    damageAmount: 7,
+    magazineSize: 20,
+    barrels: [
+        { pos: new Vec2(), angle: 0, size: 1.0 },
+        { pos: new Vec2(), angle: 180, size: 1.0 },
+    ],
+};
+
+export const DOUBLE_GUN: WeaponConfig = {
+    name: 'DoubleGun',
+    fireMode: FireMode.BURST,
+    fireRate: 1.0,
+    bulletSpeed: 25,
+    damageAmount: 3,
+    magazineSize: 30,
+    burstCount: 5,
+    burstDelay: 0.08,
+    barrels: [
+        { pos: new Vec2(0, -10), angle: 0, size: 1.0 },
+        { pos: new Vec2(0, 10), angle: 0, size: 1.0 },
+    ],
+};

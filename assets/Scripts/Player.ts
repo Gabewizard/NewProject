@@ -2,8 +2,6 @@ import {
     _decorator,
     Camera,
     Component,
-    EventKeyboard,
-    EventMouse,
     Node,
     Prefab,
     Quat,
@@ -33,6 +31,10 @@ export class Player extends Component {
 
     public initialize(camera: Camera): void {
         this.mainCamera = camera;
+        // Inject the camera when GameCtrl supplies it, independent of start order.
+        if (this.inputSystem) {
+            this.inputSystem.initialize(this.mainCamera);
+        }
     }
 
     public initializeWeapon(
@@ -50,17 +52,21 @@ export class Player extends Component {
         }
     }
 
-    start(): void {}
-
     protected update(deltaTime: number): void {
         if (this.inputSystem && this.movementSystem) {
             let moveDir = this.inputSystem.getMoveDirection();
             this.movementSystem.updateMovement(moveDir);
+            const targetAngle = this.inputSystem.getRotationAngle();
+            this.movementSystem.updateRotation(targetAngle);
         }
 
         if (this.inputSystem && this.weaponSystem) {
             let isFiring = this.inputSystem.isShooting;
-            this.weaponSystem.processFiring(isFiring, this.getFiringAngle());
+            const firingAngle = this.getFiringAngle();
+            this.weaponSystem.processFiring(isFiring, firingAngle);
+            if (this.inputSystem.getSingleShotIntent()) {
+                this.weaponSystem.triggerSingleShot(firingAngle);
+            }
         }
     }
 
@@ -68,44 +74,5 @@ export class Player extends Component {
         // Use the full 2D heading after physics writes the node rotation.
         Quat.toEulerInYXZOrder(this.firingEuler, this.node.worldRotation);
         return this.firingEuler.z;
-    }
-
-    public processKeyDown(event: EventKeyboard): void {
-        if (this.inputSystem) {
-            this.inputSystem.handleKeyDown(event);
-        }
-    }
-
-    public processKeyUp(event: EventKeyboard): void {
-        if (this.inputSystem) {
-            this.inputSystem.handleKeyUp(event);
-        }
-    }
-
-    public processMouseDown(event: EventMouse): void {
-        if (this.inputSystem) {
-            this.inputSystem.handleMouseDown(event);
-        }
-
-        if (event.getButton() === 0 && this.weaponSystem) {
-            this.weaponSystem.triggerSingleShot(this.getFiringAngle());
-        }
-    }
-
-    public processMouseUp(event: EventMouse): void {
-        if (this.inputSystem) {
-            this.inputSystem.handleMouseUp(event);
-        }
-    }
-
-    public processMouseMove(event: EventMouse): void {
-        if (this.inputSystem && this.movementSystem && this.mainCamera) {
-            let targetAngle = this.inputSystem.handleMouseMove(
-                event,
-                this.mainCamera,
-                this.node.getWorldPosition(),
-            );
-            this.movementSystem.updateRotation(targetAngle);
-        }
     }
 }

@@ -37,6 +37,7 @@ export class Enemy extends Component {
             return;
         }
         if (this.inputSystem && this.movementSystem) {
+            this.inputSystem.processFSM(deltaTime);
             this.movementSystem.updateMovement(this.inputSystem.getMoveDirection());
             this.movementSystem.updateRotation(this.inputSystem.getRotationAngle());
         }

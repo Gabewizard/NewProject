@@ -1,35 +1,29 @@
-import { _decorator, Component, Node, Vec2 } from 'cc';
+import { _decorator, Component, Vec2 } from 'cc';
 import type { IInputSystem } from './IInputSystem';
-import { SeekBehavior } from './SeekBehavior';
+import { WanderBehavior } from './WanderBehavior';
 
 const { ccclass } = _decorator;
 
 @ccclass('EnemyInputSystem')
 export class EnemyInputSystem extends Component implements IInputSystem {
-    private seek: SeekBehavior = new SeekBehavior();
-    private targetNode: Node | null = null;
+    private wander: WanderBehavior = new WanderBehavior();
 
-    public initialize(targetNode: Node | null): void {
-        this.targetNode = targetNode;
+    public initialize(wayPoints: Vec2[]): void {
+        this.wander.setWayPoints(wayPoints);
     }
 
     public getMoveDirection(): Vec2 {
-        if (!this.targetNode) return new Vec2();
-
         const currentPosition = new Vec2(
             this.node.worldPosition.x,
             this.node.worldPosition.y,
         );
-        const targetPosition = new Vec2(
-            this.targetNode.worldPosition.x,
-            this.targetNode.worldPosition.y,
-        );
-
-        return this.seek.getDesiredVelocity(currentPosition, targetPosition);
+        if (this.wander.hasArrived(currentPosition)) {
+            this.wander.pickNewWanderPoint();
+        }
+        return this.wander.getDesiredVelocity(currentPosition);
     }
 
     public getRotationAngle(): number | null {
-        // Let movement turn the sprite toward its current velocity.
         return null;
     }
 }

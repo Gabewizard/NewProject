@@ -1,4 +1,4 @@
-import { _decorator, Component, Vec2 } from 'cc';
+import { _decorator, Component, find, Vec2 } from 'cc';
 import { EnemyInputSystem } from './EnemyInputSystem';
 import { EnemyMovementSystem } from './EnemyMovementSystem';
 import { HealthSystem } from './HealthSystem';
@@ -27,7 +27,7 @@ export class Enemy extends Component {
                 child.worldPosition.y,
             ))
             : [];
-        this.inputSystem.initialize(wanderPoints);
+        this.inputSystem.initialize(find('Canvas/Player'), wanderPoints);
     }
 
     protected update(deltaTime: number): void {

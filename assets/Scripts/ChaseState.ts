@@ -2,7 +2,7 @@ import { Vec2 } from 'cc';
 import type { EnemyInputSystem } from './EnemyInputSystem';
 import type { IState } from './IState';
 
-export class PatrolState implements IState {
+export class ChaseState implements IState {
     public enter(brain: EnemyInputSystem): void {}
 
     public execute(brain: EnemyInputSystem, dt: number): void {
@@ -10,16 +10,12 @@ export class PatrolState implements IState {
             brain.node.worldPosition.x,
             brain.node.worldPosition.y,
         );
-        if (brain.getDistanceToPlayer(currentPosition) < brain.spotPlayerDistance) {
-            brain.changeState(brain.chaseState);
+        if (!brain.targetNode ||
+            brain.getDistanceToPlayer(currentPosition) > brain.losePlayerDistance) {
+            brain.changeState(brain.lostPlayerState);
             return;
         }
-        if (brain.wander.hasArrived(currentPosition)) {
-            brain.wander.pickNewWanderPoint();
-            brain.changeState(brain.arrivedState);
-            return;
-        }
-        const direction = brain.wander.getDesiredVelocity(currentPosition);
+        const direction = brain.seek.getDesiredVelocity(currentPosition, brain.getPlayerPos());
         brain.setMoveDirection(direction);
     }
 

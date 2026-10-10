@@ -47,6 +47,11 @@ export class EnemyMovementSystem extends Component {
         this.rigidBody.linearVelocity = currentVelocity;
     }
 
+    public isMovingSlowly(): boolean {
+        if (!this.rigidBody) return true;
+        return this.rigidBody.linearVelocity.lengthSqr() < 10;
+    }
+
     private clampForce(force: Vec2, maxForce: number): Vec2 {
         if (force.lengthSqr() > maxForce ** 2) {
             force.normalize().multiplyScalar(maxForce);

@@ -3,7 +3,12 @@ import type { EnemyInputSystem } from './EnemyInputSystem';
 import type { IState } from './IState';
 
 export class PatrolState implements IState {
-    public enter(brain: EnemyInputSystem): void {}
+    private stuckTimer: number = 0;
+    private stuckThresholdTime: number = 0.5;
+
+    public enter(brain: EnemyInputSystem): void {
+        this.stuckTimer = 0;
+    }
 
     public execute(brain: EnemyInputSystem, dt: number): void {
         const currentPosition = new Vec2(
@@ -19,6 +24,16 @@ export class PatrolState implements IState {
             brain.changeState(brain.arrivedState);
             return;
         }
+        if (brain.isMovingSlowly) {
+            this.stuckTimer += dt;
+            if (this.stuckTimer >= this.stuckThresholdTime) {
+                brain.changeState(brain.stuckState);
+                return;
+            }
+        } else {
+            this.stuckTimer = Math.max(0, this.stuckTimer - dt * 2);
+        }
+
         const direction = brain.wander.getDesiredVelocity(currentPosition);
         brain.setMoveDirection(direction);
     }

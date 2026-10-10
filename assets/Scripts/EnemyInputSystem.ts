@@ -7,6 +7,8 @@ import { ArrivedState } from './ArrivedState';
 import { SeekBehavior } from './SeekBehavior';
 import { ChaseState } from './ChaseState';
 import { LostPlayerState } from './LostPlayerState';
+import { FleeBehavior } from './FleeBehavior';
+import { StuckState } from './StuckState';
 
 const { ccclass, property } = _decorator;
 
@@ -14,6 +16,9 @@ const { ccclass, property } = _decorator;
 export class EnemyInputSystem extends Component implements IInputSystem {
     @property({ type: Label })
     public stateDebugLabel: Label | null = null;
+
+    public flee: FleeBehavior = new FleeBehavior();
+    public stuckState: StuckState = new StuckState();
 
     public seek: SeekBehavior = new SeekBehavior();
     public targetNode: Node | null = null;
@@ -26,6 +31,16 @@ export class EnemyInputSystem extends Component implements IInputSystem {
     public arrivedState: ArrivedState = new ArrivedState();
     private currentState: IState | null = null;
     private currentMoveDir: Vec2 = new Vec2();
+
+    private _isMovingSlowly: boolean = false;
+
+    public get isMovingSlowly(): boolean {
+        return this._isMovingSlowly;
+    }
+
+    public set isMovingSlowly(value: boolean) {
+        this._isMovingSlowly = value;
+    }
 
     public initialize(targetNode: Node | null, wayPoints: Vec2[]): void {
         this.targetNode = targetNode;

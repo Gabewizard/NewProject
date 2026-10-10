@@ -16,8 +16,17 @@ export class Enemy extends Component {
     @property({ group: 'Intent Weights', slide: true, range: [0, 5, 0.1] })
     public fleeWeight: number = 0.0;
 
-    @property({ group: 'Movement Weights', slide: true, range: [0, 5, 0.1] })
+    @property({ group: 'Intent Weights', slide: true, range: [0, 5, 0.1] })
+    public maxPredictionTime: number = 2.0;
+
+    @property({ group: 'Intent Weights', slide: true, range: [0, 5, 0.1] })
     public maxSpeed: number = 4;
+
+    @property({ group: 'Intent Weights', slide: true, range: [0, 500, 10] })
+    public spotPlayerDistance: number = 200;
+
+    @property({ group: 'Intent Weights', slide: true, range: [0, 500, 10] })
+    public lostPlayerDistance: number = 250;
 
     @property({ group: 'Movement Weights', slide: true, range: [0, 1, 0.1] })
     public maxTurnForce: number = 0.2;
@@ -44,7 +53,6 @@ export class Enemy extends Component {
     public cohesionRadius: number = 0;
 
     private movementConfig: MovementConfig = {
-        maxSpeed: 4,
         maxTurnForce: 0.2,
         avoidWeight: 3,
         whiskers: [],
@@ -54,7 +62,10 @@ export class Enemy extends Component {
             cohesionWeight: 0, cohesionRadius: 0,
         },
     };
-    private intentConfig: IntentConfig = { seekWeight: 1.0, fleeWeight: 0.0 };
+    private intentConfig: IntentConfig = {
+        seekWeight: 1.0, fleeWeight: 0.0, maxSpeed: 4, maxPredictionTime: 2.0,
+        spotPlayerDistance: 200, lostPlayerDistance: 250,
+    };
     private inputSystem: EnemyInputSystem | null = null;
     private movementSystem: EnemyMovementSystem | null = null;
     private healthSystem: HealthSystem | null = null;
@@ -69,9 +80,12 @@ export class Enemy extends Component {
         this.intentConfig = {
             seekWeight: this.seekWeight,
             fleeWeight: this.fleeWeight,
+            maxSpeed: this.maxSpeed,
+            maxPredictionTime: this.maxPredictionTime,
+            spotPlayerDistance: this.spotPlayerDistance,
+            lostPlayerDistance: this.lostPlayerDistance,
         };
         this.movementConfig = {
-            maxSpeed: this.maxSpeed,
             maxTurnForce: this.maxTurnForce,
             avoidWeight: this.avoidWeight,
             flocking: {
@@ -93,7 +107,7 @@ export class Enemy extends Component {
     }
 
     protected start(): void {
-        if (this.movementSystem) this.movementSystem.init(this.movementConfig);
+        if (this.movementSystem) this.movementSystem.init(this.intentConfig.maxSpeed, this.movementConfig);
         if (!this.inputSystem) return;
         const wanderNodes = this.node.parent?.getChildByName('WanderNodes');
         const wanderPoints = wanderNodes
@@ -127,4 +141,3 @@ export class Enemy extends Component {
         if (index > -1) Enemy.activeEnemies.splice(index, 1);
     }
 }
-

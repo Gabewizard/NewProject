@@ -26,8 +26,8 @@ export class EnemyMovementSystem extends Component {
         this.rigidBody = this.getComponent(RigidBody2D);
     }
 
-    public init(movementConfig: MovementConfig): void {
-        this.maxSpeed = movementConfig.maxSpeed;
+    public init(maxSpeed: number, movementConfig: MovementConfig): void {
+        this.maxSpeed = maxSpeed;
         this.maxTurnForce = movementConfig.maxTurnForce;
         this.tacticalSteering = new TacticalSteeringBehavior(movementConfig, this);
     }
@@ -104,4 +104,3 @@ export class EnemyMovementSystem extends Component {
         return force;
     }
 }
-

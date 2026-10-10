@@ -32,6 +32,9 @@ export class EnemyInputSystem extends Component implements IInputSystem {
     public wander: WanderBehavior = new WanderBehavior();
     public patrolState: PatrolState = new PatrolState();
     public arrivedState: ArrivedState = new ArrivedState();
+    private lastTargetPos: Vec2 | null = null;
+    private trackedTargetNode: Node | null = null;
+    private targetVelocity: Vec2 = new Vec2();
     private currentState: IState | null = null;
     private currentMoveDir: Vec2 = new Vec2();
 
@@ -51,6 +54,13 @@ export class EnemyInputSystem extends Component implements IInputSystem {
         intentConfig: IntentConfig,
     ): void {
         this.targetNode = targetNode;
+        this.trackedTargetNode = targetNode;
+        this.lastTargetPos = targetNode?.isValid
+            ? new Vec2(targetNode.worldPosition.x, targetNode.worldPosition.y)
+            : null;
+        this.targetVelocity.set(0, 0);
+        this.spotPlayerDistance = intentConfig.spotPlayerDistance;
+        this.losePlayerDistance = intentConfig.lostPlayerDistance;
         this.wander.init(wayPoints, intentConfig);
         this.compositeIntent.setWeights(intentConfig);
         this.changeState(this.patrolState);
@@ -68,6 +78,23 @@ export class EnemyInputSystem extends Component implements IInputSystem {
     }
 
     public processFSM(dt: number): void {
+        this.targetVelocity.set(0, 0);
+        if (this.targetNode?.isValid) {
+            const currentTargetPos = new Vec2(
+                this.targetNode.worldPosition.x,
+                this.targetNode.worldPosition.y,
+            );
+            if (this.trackedTargetNode === this.targetNode && this.lastTargetPos
+                && Number.isFinite(dt) && dt > 0) {
+                Vec2.subtract(this.targetVelocity, currentTargetPos, this.lastTargetPos);
+                this.targetVelocity.multiplyScalar(1.0 / dt);
+            }
+            this.lastTargetPos = currentTargetPos;
+            this.trackedTargetNode = this.targetNode;
+        } else {
+            this.lastTargetPos = null;
+            this.trackedTargetNode = null;
+        }
         if (this.currentState) this.currentState.execute(this, dt);
     }
 
@@ -79,14 +106,18 @@ export class EnemyInputSystem extends Component implements IInputSystem {
         return this.currentMoveDir;
     }
 
+    public getTargetVelocity(): Vec2 {
+        return this.targetVelocity.clone();
+    }
+
     public getPlayerPos(): Vec2 {
-        return this.targetNode
+        return this.targetNode?.isValid
             ? new Vec2(this.targetNode.worldPosition.x, this.targetNode.worldPosition.y)
             : new Vec2();
     }
 
     public getDistanceToPlayer(currentPosition: Vec2): number {
-        if (!this.targetNode) return Infinity;
+        if (!this.targetNode?.isValid) return Infinity;
         return Vec2.distance(currentPosition, this.getPlayerPos());
     }
 

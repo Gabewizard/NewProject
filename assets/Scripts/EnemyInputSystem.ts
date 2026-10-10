@@ -9,6 +9,8 @@ import { ChaseState } from './ChaseState';
 import { LostPlayerState } from './LostPlayerState';
 import { FleeBehavior } from './FleeBehavior';
 import { StuckState } from './StuckState';
+import { IntentSteeringBehavior } from './IntentSteeringBehavior';
+import type { IntentConfig } from './EnemyConfig';
 
 const { ccclass, property } = _decorator;
 
@@ -17,6 +19,7 @@ export class EnemyInputSystem extends Component implements IInputSystem {
     @property({ type: Label })
     public stateDebugLabel: Label | null = null;
 
+    public compositeIntent: IntentSteeringBehavior = new IntentSteeringBehavior();
     public flee: FleeBehavior = new FleeBehavior();
     public stuckState: StuckState = new StuckState();
 
@@ -42,9 +45,14 @@ export class EnemyInputSystem extends Component implements IInputSystem {
         this._isMovingSlowly = value;
     }
 
-    public initialize(targetNode: Node | null, wayPoints: Vec2[]): void {
+    public initialize(
+        targetNode: Node | null,
+        wayPoints: Vec2[],
+        intentConfig: IntentConfig,
+    ): void {
         this.targetNode = targetNode;
-        this.wander.setWayPoints(wayPoints);
+        this.wander.init(wayPoints, intentConfig);
+        this.compositeIntent.setWeights(intentConfig);
         this.changeState(this.patrolState);
     }
 

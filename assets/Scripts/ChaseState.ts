@@ -36,7 +36,7 @@ export class ChaseState implements IState {
             this.stuckTimer = 0;
         }
 
-        const direction = brain.seek.getDesiredVelocity(currentPosition, brain.getPlayerPos());
+        const direction = brain.compositeIntent.getDesiredVelocity(currentPosition, brain.getPlayerPos());
         brain.setMoveDirection(direction);
     }
 

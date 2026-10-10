@@ -8,6 +8,8 @@ const { ccclass, property } = _decorator;
 
 @ccclass('Enemy')
 export class Enemy extends Component {
+    public static activeEnemies: Enemy[] = [];
+
     @property({ group: 'Intent Weights', slide: true, range: [0, 5, 0.1] })
     public seekWeight: number = 1.0;
 
@@ -26,6 +28,9 @@ export class Enemy extends Component {
     @property({ group: 'Movement Weights', slide: true, range: [0, 5, 0.1] })
     public separationWeight: number = 0;
 
+    @property({ group: 'Movement Weights', slide: true, range: [0, 150, 5] })
+    public separationRadius: number = 50;
+
     @property({ group: 'Movement Weights', slide: true, range: [0, 5, 0.1] })
     public alignmentWeight: number = 0;
 
@@ -37,7 +42,7 @@ export class Enemy extends Component {
         maxTurnForce: 0.2,
         avoidWeight: 3,
         whiskers: [],
-        flocking: { separationWeight: 0, alignmentWeight: 0, cohesionWeight: 0 },
+        flocking: { separationWeight: 0, separationRadius: 50, alignmentWeight: 0, cohesionWeight: 0 },
     };
     private intentConfig: IntentConfig = { seekWeight: 1.0, fleeWeight: 0.0 };
     private inputSystem: EnemyInputSystem | null = null;
@@ -45,6 +50,7 @@ export class Enemy extends Component {
     private healthSystem: HealthSystem | null = null;
 
     protected onLoad(): void {
+        Enemy.activeEnemies.push(this);
         this.inputSystem = this.getComponent(EnemyInputSystem);
         this.movementSystem = this.getComponent(EnemyMovementSystem);
         this.healthSystem = this.getComponent(HealthSystem);
@@ -60,6 +66,7 @@ export class Enemy extends Component {
             avoidWeight: this.avoidWeight,
             flocking: {
                 separationWeight: this.separationWeight,
+                separationRadius: this.separationRadius,
                 alignmentWeight: this.alignmentWeight,
                 cohesionWeight: this.cohesionWeight,
             },
@@ -102,5 +109,9 @@ export class Enemy extends Component {
         if (this.inputSystem?.stateDebugLabel) {
             this.inputSystem.stateDebugLabel.node.angle = -this.node.angle;
         }
+    }
+    protected onDestroy(): void {
+        const index = Enemy.activeEnemies.indexOf(this);
+        if (index > -1) Enemy.activeEnemies.splice(index, 1);
     }
 }

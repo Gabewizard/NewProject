@@ -717,7 +717,8 @@
     "maxSpeed": 4,
     "maxTurnForce": 0.2,
     "avoidWeight": 3,
-    "separationWeight": 0,
+    "separationWeight": 3,
+    "separationRadius": 100,
     "alignmentWeight": 0,
     "cohesionWeight": 0,
     "_id": ""

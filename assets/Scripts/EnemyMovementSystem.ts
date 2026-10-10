@@ -2,6 +2,7 @@ import { _decorator, Component, Graphics, math, RigidBody2D, Vec2 } from 'cc';
 
 import type { MovementConfig } from './EnemyConfig';
 
+import { Enemy } from './Enemy';
 import { TacticalSteeringBehavior } from './TacticalSteeringBehavior';
 
 const { ccclass, property } = _decorator;
@@ -71,6 +72,19 @@ export class EnemyMovementSystem extends Component {
     public isMovingSlowly(): boolean {
         if (!this.rigidBody) return true;
         return this.rigidBody.linearVelocity.lengthSqr() < 10;
+    }
+
+    public getNeighbors(): Vec2[] {
+        const neighbors: Vec2[] = [];
+        for (const otherEnemy of Enemy.activeEnemies) {
+            if (otherEnemy.node === this.node || !otherEnemy.node.isValid
+                || !otherEnemy.enabledInHierarchy) continue;
+            neighbors.push(new Vec2(
+                otherEnemy.node.worldPosition.x,
+                otherEnemy.node.worldPosition.y,
+            ));
+        }
+        return neighbors;
     }
 
     private clampForce(force: Vec2, maxForce: number): Vec2 {

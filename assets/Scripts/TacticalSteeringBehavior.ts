@@ -3,16 +3,21 @@ import type { ISteeringBehavior } from './ISteeringBehavior';
 import type { MovementConfig } from './EnemyConfig';
 import type { EnemyMovementSystem } from './EnemyMovementSystem';
 import { AvoidBehavior } from './AvoidBehavior';
+import { SeparationBehavior } from './SeparationBehavior';
 
 export class TacticalSteeringBehavior implements ISteeringBehavior {
     private movementConfig: MovementConfig;
     private brain: EnemyMovementSystem;
     private avoidBehavior: AvoidBehavior;
+    private separationBehavior: SeparationBehavior;
 
     constructor(movementConfig: MovementConfig, enemyMovementSystem: EnemyMovementSystem) {
         this.movementConfig = movementConfig;
         this.brain = enemyMovementSystem;
         this.avoidBehavior = new AvoidBehavior(enemyMovementSystem, movementConfig.whiskers);
+        this.separationBehavior = new SeparationBehavior(
+            enemyMovementSystem, movementConfig.flocking.separationRadius,
+        );
     }
 
     public getDesiredVelocity(currentPosition: Vec2): Vec2 {
@@ -25,7 +30,13 @@ export class TacticalSteeringBehavior implements ISteeringBehavior {
             this.brain.debugGraphics.clear();
         }
 
-        // Separation, alignment, and cohesion are added in the next videos.
+        if (this.movementConfig.flocking.separationWeight > 0) {
+            const separationForce = this.separationBehavior.getDesiredVelocity(currentPosition);
+            separationForce.multiplyScalar(this.movementConfig.flocking.separationWeight);
+            totalTacticalForce.add(separationForce);
+        }
+
+        // Alignment and cohesion are added in the next video.
         if (totalTacticalForce.lengthSqr() > 1.0) totalTacticalForce.normalize();
         return totalTacticalForce;
     }

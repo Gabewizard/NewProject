@@ -4,6 +4,8 @@ import type { WhiskerConfig } from './EnemyConfig';
 import type { EnemyMovementSystem } from './EnemyMovementSystem';
 
 export class AvoidBehavior implements ISteeringBehavior {
+    // OBSTACLES is physics group index 5 in this project (bit mask 32).
+    private readonly GROUP_OBSTACLES: number = 1 << 5;
     private brain: EnemyMovementSystem;
     private whiskers: WhiskerConfig[];
     private currentHitNormals: Vec2[] = [];
@@ -35,7 +37,7 @@ export class AvoidBehavior implements ISteeringBehavior {
             );
             const worldEnd = this.getEndPoint(worldStart, myAngle + whisker.angle, whisker.length);
             const results = PhysicsSystem2D.instance.raycast(
-                worldStart, worldEnd, ERaycast2DType.Closest,
+                worldStart, worldEnd, ERaycast2DType.Closest, this.GROUP_OBSTACLES,
             );
 
             if (results.length > 0) {

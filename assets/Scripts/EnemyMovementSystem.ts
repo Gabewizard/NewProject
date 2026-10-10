@@ -1,15 +1,22 @@
 import { _decorator, Component, math, RigidBody2D, Vec2 } from 'cc';
 
+import type { MovementConfig } from './EnemyConfig';
+
 const { ccclass } = _decorator;
 
 @ccclass('EnemyMovementSystem')
 export class EnemyMovementSystem extends Component {
-    private maxSpeed: number = 4;
-    private maxTurnForce: number = 0.2;
+    private maxSpeed: number | null = null;
+    private maxTurnForce: number | null = null;
     private rigidBody: RigidBody2D | null = null;
 
     protected onLoad(): void {
         this.rigidBody = this.getComponent(RigidBody2D);
+    }
+
+    public init(movementConfig: MovementConfig): void {
+        this.maxSpeed = movementConfig.maxSpeed;
+        this.maxTurnForce = movementConfig.maxTurnForce;
     }
 
     public updateRotation(angleDegrees: number | null): void {
@@ -32,7 +39,7 @@ export class EnemyMovementSystem extends Component {
     }
 
     public updateMovement(moveDirection: Vec2): void {
-        if (!this.rigidBody) return;
+        if (!this.rigidBody || this.maxSpeed === null || this.maxTurnForce === null) return;
 
         let currentVelocity = this.getVelocity();
         const desiredVelocity = new Vec2();

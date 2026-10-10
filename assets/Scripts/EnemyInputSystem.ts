@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Vec2 } from 'cc';
+import { _decorator, Component, Label, Node, Vec2 } from 'cc';
 import type { IInputSystem } from './IInputSystem';
 import type { IState } from './IState';
 import { WanderBehavior } from './WanderBehavior';
@@ -8,10 +8,13 @@ import { SeekBehavior } from './SeekBehavior';
 import { ChaseState } from './ChaseState';
 import { LostPlayerState } from './LostPlayerState';
 
-const { ccclass } = _decorator;
+const { ccclass, property } = _decorator;
 
 @ccclass('EnemyInputSystem')
 export class EnemyInputSystem extends Component implements IInputSystem {
+    @property({ type: Label })
+    public stateDebugLabel: Label | null = null;
+
     public seek: SeekBehavior = new SeekBehavior();
     public targetNode: Node | null = null;
     public spotPlayerDistance: number = 200;
@@ -35,6 +38,10 @@ export class EnemyInputSystem extends Component implements IInputSystem {
         if (this.currentState) this.currentState.exit(this);
         this.currentState = newState;
         this.currentState.enter(this);
+
+        if (this.stateDebugLabel) {
+            this.stateDebugLabel.string = newState.constructor.name;
+        }
     }
 
     public processFSM(dt: number): void {

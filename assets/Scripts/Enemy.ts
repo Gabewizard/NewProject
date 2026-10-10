@@ -41,5 +41,9 @@ export class Enemy extends Component {
             this.movementSystem.updateMovement(this.inputSystem.getMoveDirection());
             this.movementSystem.updateRotation(this.inputSystem.getRotationAngle());
         }
+
+        if (this.inputSystem?.stateDebugLabel) {
+            this.inputSystem.stateDebugLabel.node.angle = -this.node.angle;
+        }
     }
 }

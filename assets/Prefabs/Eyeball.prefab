@@ -720,7 +720,9 @@
     "separationWeight": 3,
     "separationRadius": 100,
     "alignmentWeight": 0,
-    "cohesionWeight": 0,
+    "alignmentRadius": 0,
+    "cohesionWeight": 5,
+    "cohesionRadius": 0,
     "_id": ""
   },
   {

@@ -5,6 +5,11 @@ import type { MovementConfig } from './EnemyConfig';
 import { Enemy } from './Enemy';
 import { TacticalSteeringBehavior } from './TacticalSteeringBehavior';
 
+export interface NeighborData {
+    position: Vec2;
+    velocity: Vec2;
+}
+
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyMovementSystem')
@@ -74,15 +79,20 @@ export class EnemyMovementSystem extends Component {
         return this.rigidBody.linearVelocity.lengthSqr() < 10;
     }
 
-    public getNeighbors(): Vec2[] {
-        const neighbors: Vec2[] = [];
+    public getNeighbors(): NeighborData[] {
+        const neighbors: NeighborData[] = [];
         for (const otherEnemy of Enemy.activeEnemies) {
             if (otherEnemy.node === this.node || !otherEnemy.node.isValid
                 || !otherEnemy.enabledInHierarchy) continue;
-            neighbors.push(new Vec2(
-                otherEnemy.node.worldPosition.x,
-                otherEnemy.node.worldPosition.y,
-            ));
+            const otherMovement = otherEnemy.getComponent(EnemyMovementSystem);
+            if (!otherMovement) continue;
+            neighbors.push({
+                position: new Vec2(
+                    otherEnemy.node.worldPosition.x,
+                    otherEnemy.node.worldPosition.y,
+                ),
+                velocity: otherMovement.getVelocity(),
+            });
         }
         return neighbors;
     }
@@ -94,3 +104,4 @@ export class EnemyMovementSystem extends Component {
         return force;
     }
 }
+

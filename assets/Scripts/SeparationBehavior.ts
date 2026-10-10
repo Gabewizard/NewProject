@@ -18,14 +18,14 @@ export class SeparationBehavior implements ISteeringBehavior {
         let pushCount = 0;
 
         for (const neighbor of neighbors) {
-            const distance = Vec2.distance(currentPosition, neighbor);
+            const distance = Vec2.distance(currentPosition, neighbor.position);
             if (distance >= this.separationRadius) continue;
 
             const pushVector = new Vec2();
             if (distance === 0) {
                 pushVector.set(math.randomRange(-0.1, 0.1), math.randomRange(-0.1, 0.1));
             } else {
-                Vec2.subtract(pushVector, currentPosition, neighbor);
+                Vec2.subtract(pushVector, currentPosition, neighbor.position);
                 pushVector.normalize();
                 const strength = 1.0 - distance / this.separationRadius;
                 pushVector.multiplyScalar(strength);
@@ -38,3 +38,4 @@ export class SeparationBehavior implements ISteeringBehavior {
         return separationForce;
     }
 }
+

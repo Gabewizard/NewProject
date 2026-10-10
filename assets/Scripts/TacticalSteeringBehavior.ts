@@ -4,12 +4,16 @@ import type { MovementConfig } from './EnemyConfig';
 import type { EnemyMovementSystem } from './EnemyMovementSystem';
 import { AvoidBehavior } from './AvoidBehavior';
 import { SeparationBehavior } from './SeparationBehavior';
+import { AlignmentBehavior } from './AlignmentBehavior';
+import { CohesionBehavior } from './CohesionBehavior';
 
 export class TacticalSteeringBehavior implements ISteeringBehavior {
     private movementConfig: MovementConfig;
     private brain: EnemyMovementSystem;
     private avoidBehavior: AvoidBehavior;
     private separationBehavior: SeparationBehavior;
+    private alignmentBehavior: AlignmentBehavior;
+    private cohesionBehavior: CohesionBehavior;
 
     constructor(movementConfig: MovementConfig, enemyMovementSystem: EnemyMovementSystem) {
         this.movementConfig = movementConfig;
@@ -17,6 +21,12 @@ export class TacticalSteeringBehavior implements ISteeringBehavior {
         this.avoidBehavior = new AvoidBehavior(enemyMovementSystem, movementConfig.whiskers);
         this.separationBehavior = new SeparationBehavior(
             enemyMovementSystem, movementConfig.flocking.separationRadius,
+        );
+        this.alignmentBehavior = new AlignmentBehavior(
+            enemyMovementSystem, movementConfig.flocking.alignmentRadius,
+        );
+        this.cohesionBehavior = new CohesionBehavior(
+            enemyMovementSystem, movementConfig.flocking.cohesionRadius,
         );
     }
 
@@ -36,8 +46,20 @@ export class TacticalSteeringBehavior implements ISteeringBehavior {
             totalTacticalForce.add(separationForce);
         }
 
-        // Alignment and cohesion are added in the next video.
+        if (this.movementConfig.flocking.alignmentWeight > 0) {
+            const alignmentForce = this.alignmentBehavior.getDesiredVelocity(currentPosition);
+            alignmentForce.multiplyScalar(this.movementConfig.flocking.alignmentWeight);
+            totalTacticalForce.add(alignmentForce);
+        }
+
+        if (this.movementConfig.flocking.cohesionWeight > 0) {
+            const cohesionForce = this.cohesionBehavior.getDesiredVelocity(currentPosition);
+            cohesionForce.multiplyScalar(this.movementConfig.flocking.cohesionWeight);
+            totalTacticalForce.add(cohesionForce);
+        }
+
         if (totalTacticalForce.lengthSqr() > 1.0) totalTacticalForce.normalize();
         return totalTacticalForce;
     }
 }
+

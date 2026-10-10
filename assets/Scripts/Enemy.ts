@@ -34,15 +34,25 @@ export class Enemy extends Component {
     @property({ group: 'Movement Weights', slide: true, range: [0, 5, 0.1] })
     public alignmentWeight: number = 0;
 
+    @property({ group: 'Movement Weights', slide: true, range: [0, 200, 5] })
+    public alignmentRadius: number = 0;
+
     @property({ group: 'Movement Weights', slide: true, range: [0, 5, 0.1] })
     public cohesionWeight: number = 0;
+
+    @property({ group: 'Movement Weights', slide: true, range: [0, 400, 5] })
+    public cohesionRadius: number = 0;
 
     private movementConfig: MovementConfig = {
         maxSpeed: 4,
         maxTurnForce: 0.2,
         avoidWeight: 3,
         whiskers: [],
-        flocking: { separationWeight: 0, separationRadius: 50, alignmentWeight: 0, cohesionWeight: 0 },
+        flocking: {
+            separationWeight: 0, separationRadius: 50,
+            alignmentWeight: 0, alignmentRadius: 0,
+            cohesionWeight: 0, cohesionRadius: 0,
+        },
     };
     private intentConfig: IntentConfig = { seekWeight: 1.0, fleeWeight: 0.0 };
     private inputSystem: EnemyInputSystem | null = null;
@@ -68,7 +78,9 @@ export class Enemy extends Component {
                 separationWeight: this.separationWeight,
                 separationRadius: this.separationRadius,
                 alignmentWeight: this.alignmentWeight,
+                alignmentRadius: this.alignmentRadius,
                 cohesionWeight: this.cohesionWeight,
+                cohesionRadius: this.cohesionRadius,
             },
             whiskers: [
                 { startPos: new Vec2(), angle: 0, length: 100 },
@@ -115,3 +127,4 @@ export class Enemy extends Component {
         if (index > -1) Enemy.activeEnemies.splice(index, 1);
     }
 }
+

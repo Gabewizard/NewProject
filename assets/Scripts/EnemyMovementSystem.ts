@@ -1,11 +1,17 @@
-import { _decorator, Component, math, RigidBody2D, Vec2 } from 'cc';
+import { _decorator, Component, Graphics, math, RigidBody2D, Vec2 } from 'cc';
 
 import type { MovementConfig } from './EnemyConfig';
 
-const { ccclass } = _decorator;
+import { TacticalSteeringBehavior } from './TacticalSteeringBehavior';
+
+const { ccclass, property } = _decorator;
 
 @ccclass('EnemyMovementSystem')
 export class EnemyMovementSystem extends Component {
+    @property({ type: Graphics })
+    public debugGraphics: Graphics | null = null;
+
+    private tacticalSteering: TacticalSteeringBehavior | null = null;
     private maxSpeed: number | null = null;
     private maxTurnForce: number | null = null;
     private rigidBody: RigidBody2D | null = null;
@@ -17,6 +23,7 @@ export class EnemyMovementSystem extends Component {
     public init(movementConfig: MovementConfig): void {
         this.maxSpeed = movementConfig.maxSpeed;
         this.maxTurnForce = movementConfig.maxTurnForce;
+        this.tacticalSteering = new TacticalSteeringBehavior(movementConfig, this);
     }
 
     public updateRotation(angleDegrees: number | null): void {
@@ -42,8 +49,15 @@ export class EnemyMovementSystem extends Component {
         if (!this.rigidBody || this.maxSpeed === null || this.maxTurnForce === null) return;
 
         let currentVelocity = this.getVelocity();
+        const currentPosition = new Vec2(this.node.worldPosition.x, this.node.worldPosition.y);
+        const tacticalAdjustments = this.tacticalSteering
+            ? this.tacticalSteering.getDesiredVelocity(currentPosition)
+            : new Vec2();
+        const combinedForces = moveDirection.clone().add(tacticalAdjustments);
+        if (combinedForces.lengthSqr() > 1.0) combinedForces.normalize();
+
         const desiredVelocity = new Vec2();
-        Vec2.multiplyScalar(desiredVelocity, moveDirection, this.maxSpeed);
+        Vec2.multiplyScalar(desiredVelocity, combinedForces, this.maxSpeed);
 
         let steeringForce = new Vec2();
         Vec2.subtract(steeringForce, desiredVelocity, currentVelocity);
